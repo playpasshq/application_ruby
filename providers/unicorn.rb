@@ -33,9 +33,18 @@ action :before_compile do
   new_resource.bundle_command rails_resource && rails_resource.bundle_command
 
   unless new_resource.restart_command
-    new_resource.restart_command do
-      execute "/etc/init.d/#{new_resource.name} hup" do
-        user "root"
+    if unicorn_resource && unicorn_resource.preload_app
+      new_resource.restart_command do
+        runit_service new_resource.name do
+          action :usr2
+          sv_timeout 30
+        end
+      end
+    else
+      new_resource.restart_command do
+        execute "/etc/init.d/#{new_resource.name} hup" do
+          user "root"
+        end
       end
     end
   end
@@ -75,18 +84,21 @@ action :before_restart do
   end
 
   runit_service new_resource.name do
-    run_template_name 'unicorn'
+    run_template_name new_resource.preload_app ? 'unicorn_with_preload' : 'unicorn'
     log_template_name 'unicorn'
+
     owner new_resource.owner if new_resource.owner
     group new_resource.group if new_resource.group
 
-    cookbook 'application_ruby'
+    cookbook(new_resource.runit_cookbook || 'application_ruby')
     options(
-      :app => new_resource,
-      :bundler => new_resource.bundler,
-      :bundle_command => new_resource.bundle_command,
-      :rails_env => new_resource.environment_name,
-      :smells_like_rack => ::File.exists?(::File.join(new_resource.path, "current", "config.ru"))
+      {
+        :app => new_resource,
+        :bundler => new_resource.bundler,
+        :bundle_command => new_resource.bundle_command,
+        :rails_env => new_resource.environment_name,
+        :smells_like_rack => ::File.exists?(::File.join(new_resource.path, "current", "config.ru"))
+      }.merge(new_resource.runit_options)
     )
   end
 
@@ -100,3 +112,8 @@ protected
 def rails_resource
   new_resource.application.sub_resources.select{|res| res.type == :rails}.first
 end
+
+def unicorn_resource
+  new_resource.application.sub_resources.select{|res| res.type == :unicorn}.first
+end
+
