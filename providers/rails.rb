@@ -26,7 +26,7 @@ action :before_compile do
 
   unless new_resource.migration_command
     command = "rake db:migrate"
-    command = "#{bundle_command} exec #{command} > #{new_resource.path}/shared/migrate_output.txt" if new_resource.bundler
+    command = "#{bundle_command} exec #{command} >> #{new_resource.path}/shared/migrate_output.txt 2>&1" if new_resource.bundler
     new_resource.migration_command command
   end
 
