@@ -33,6 +33,7 @@ attribute :precompile_assets, :kind_of => [NilClass, TrueClass, FalseClass], :de
 attribute :use_omnibus_ruby, :kind_of => [TrueClass, FalseClass], :default => false
 attribute :symlink_logs, :kind_of => [TrueClass, FalseClass], :default => false
 attribute :logrotate_template_cookbook, :kind_of => String, :default => 'logrotate'
+attribute :logrotate_path, :kind_of => [String, NilClass], :default => nil
 
 def database(*args, &block)
   @database ||= Mash.new
