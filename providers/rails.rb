@@ -66,6 +66,7 @@ end
 action :before_migrate do
 
   symlink_logs if new_resource.symlink_logs
+  new_resource.environment['GIT_SSH'] = "#{new_resource.path}/deploy-ssh-wrapper" if new_resource.deploy_key
 
   if new_resource.bundler
     Chef::Log.info "Running bundle install"
@@ -83,8 +84,8 @@ action :before_migrate do
       to "#{new_resource.path}/shared/vendor_bundle"
     end
     common_groups = %w{development test cucumber staging production}
-    common_groups += new_resource.bundler_without_groups
     common_groups -= [new_resource.environment_name]
+    common_groups += new_resource.bundler_without_groups
     common_groups = common_groups.join(' ')
     bundler_deployment = new_resource.bundler_deployment
     if bundler_deployment.nil?
@@ -123,6 +124,7 @@ action :before_migrate do
   if new_resource.migration_command.include?('rake') && !gem_names.include?('rake')
     gem_package "rake" do
       action :install
+      not_if "which rake"
     end
   end
 
@@ -164,6 +166,10 @@ end
 
 protected
 
+def bundle_options
+  new_resource.bundle_options
+end
+
 def bundle_command
   new_resource.bundle_command
 end
@@ -185,7 +191,11 @@ def install_gems
 end
 
 def create_database_yml
-  host = new_resource.find_database_server(new_resource.database_master_role)
+  if new_resource.database.has_key?("host")
+    host = new_resource.database['host']
+  else
+    host = new_resource.find_database_server(new_resource.database_master_role)
+  end
 
   template "#{new_resource.path}/shared/database.yml" do
     source new_resource.database_template || "database.yml.erb"

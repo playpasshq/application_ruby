@@ -15,7 +15,7 @@ Other application stacks may be supported at a later date.
 Requirements
 ============
 
-Chef 0.10.0 or higher required (for Chef environment use).
+Chef 11.0.0 or higher required (for Chef environment use).
 
 The following Opscode cookbooks are dependencies:
 
@@ -104,6 +104,7 @@ The `unicorn` sub-resource LWRP configures Unicorn to run the application.
 - unicorn_command_line: passed to the `unicorn_config` LWRP
 - copy_on_write: passed to the `unicorn_config` LWRP
 - enable_stats: passed to the `unicorn_config` LWRP
+- runit_template_cookbook: specify which cookbook to look for unicorn runit templates in
 
 memcached
 ---------

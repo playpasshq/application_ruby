@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 
-include Chef::Mixin::LanguageIncludeRecipe
+include Chef::DSL::IncludeRecipe
 
 action :before_compile do
 
@@ -90,7 +90,7 @@ action :before_restart do
     owner new_resource.owner if new_resource.owner
     group new_resource.group if new_resource.group
 
-    cookbook(new_resource.runit_cookbook || 'application_ruby')
+    cookbook new_resource.runit_template_cookbook
     options(
       {
         :app => new_resource,
