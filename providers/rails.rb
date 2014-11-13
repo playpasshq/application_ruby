@@ -215,8 +215,8 @@ def symlink_logs
   end
 
   logrotate_app resource.name do
-    cookbook "logrotate"
-    path "#{resource.path}/shared/#{resource.environment_name}.log"
+    cookbook resource.logrotate_template_cookbook
+    path "#{resource.path}/shared/log/#{resource.environment_name}.log"
     frequency "daily"
     rotate 30
     create "666 #{resource.owner} #{resource.group}"
