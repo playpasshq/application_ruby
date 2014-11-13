@@ -93,14 +93,9 @@ action :before_migrate do
       bundler_deployment = ::File.exists?(::File.join(new_resource.release_path, "Gemfile.lock"))
     end
 
-    git_ssh = ""
-    if new_resource.deploy_key
-     git_ssh = "GIT_SSH=\"#{new_resource.path}/deploy-ssh-wrapper\" "
-    end
-
-    command = "#{git_ssh}#{bundle_command} install --path=vendor/bundle --without #{common_groups}"
+    command = "#{bundle_command} install --path=vendor/bundle --without #{common_groups}"
     command += " --deployment" if bundler_deployment
-    command += " #{bundle_options}" if new_resource.bundle_options
+    command += " #{bundle_options}" if bundle_options
     execute command do
       cwd new_resource.release_path
       user new_resource.owner
