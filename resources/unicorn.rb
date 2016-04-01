@@ -40,6 +40,7 @@ attribute :copy_on_write, :kind_of => [TrueClass, FalseClass], :default => false
 attribute :enable_stats, :kind_of => [TrueClass, FalseClass], :default => false
 attribute :runit_options, :kind_of => Hash, :default => {}
 attribute :runit_template_cookbook, :kind_of => String, :default => 'application_ruby'
+attribute :runit_envs, :kind_of => Hash, :default => {}
 
 def options(*args, &block)
   @options ||= Mash[:tcp_nodelay => true, :backlog => 100]

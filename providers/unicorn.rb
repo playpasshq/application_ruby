@@ -90,6 +90,7 @@ action :before_restart do
     group new_resource.group if new_resource.group
 
     cookbook new_resource.runit_template_cookbook
+    env new_resource.runit_envs
     options(
       {
         :app => new_resource,
