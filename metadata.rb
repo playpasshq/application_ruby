@@ -11,5 +11,5 @@ version          "3.0.2"
 end
 
 depends "application", "~> 4.0"
-depends "runit", "~> 1.0"
+depends "runit", "< 5"
 depends "logrotate", "< 3"
